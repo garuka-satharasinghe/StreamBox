@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import MovieCard from '../components/MovieCard';
+import { colors } from '../redux/themeSlice';
+import MovieCardGrid from '../components/MovieCardGrid';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HomeStackParamList } from '../types';
 import Icon from 'react-native-vector-icons/Feather';
@@ -15,6 +16,8 @@ interface Props {
 
 const FavouritesScreen: React.FC<Props> = ({ navigation }) => {
   const favourites = useSelector((state: RootState) => state.favourites.favourites);
+  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const theme = colors[themeMode];
 
   const handleMoviePress = (movie: any) => {
     navigation.navigate('MovieDetails', { movie });
@@ -22,10 +25,10 @@ const FavouritesScreen: React.FC<Props> = ({ navigation }) => {
 
   if (favourites.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Icon name="heart" size={80} color="#666" />
-        <Text style={styles.emptyTitle}>No Favourites Yet</Text>
-        <Text style={styles.emptySubtitle}>
+      <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
+        <Icon name="heart" size={80} color={theme.textTertiary} />
+        <Text style={[styles.emptyTitle, { color: theme.text }]}>No Favourites Yet</Text>
+        <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
           Start adding movies to your favourites!
         </Text>
       </View>
@@ -33,10 +36,10 @@ const FavouritesScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Favourites</Text>
-        <Text style={styles.count}>{favourites.length} movies</Text>
+        <Text style={[styles.title, { color: theme.text }]}>My Favourites</Text>
+        <Text style={[styles.count, { color: theme.textSecondary }]}>{favourites.length} movies</Text>
       </View>
 
       <FlatList
@@ -46,9 +49,10 @@ const FavouritesScreen: React.FC<Props> = ({ navigation }) => {
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+          <MovieCardGrid movie={item} onPress={() => handleMoviePress(item)} />
         )}
         showsVerticalScrollIndicator={false}
+        key="favourites-grid"
       />
     </View>
   );
@@ -57,7 +61,6 @@ const FavouritesScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
   header: {
     padding: 16,
@@ -66,12 +69,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 4,
   },
   count: {
     fontSize: 14,
-    color: '#999',
   },
   list: {
     paddingHorizontal: 16,
@@ -79,24 +80,22 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: 'space-between',
+    gap: 12,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
     padding: 32,
   },
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
     marginTop: 24,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 16,
-    color: '#999',
     textAlign: 'center',
   },
 });

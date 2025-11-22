@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,24 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/authSlice';
+import { toggleTheme } from '../redux/themeSlice';
 import { RootState } from '../redux/store';
+import { colors } from '../redux/themeSlice';
 import Icon from 'react-native-vector-icons/Feather';
 
 const ProfileScreen: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(true);
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const theme = colors[themeMode];
+  const isDarkMode = themeMode === 'dark';
   const favouritesCount = useSelector(
     (state: RootState) => state.favourites.favourites.length
   );
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -37,95 +45,95 @@ const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <View style={styles.avatarContainer}>
+        <View style={[styles.avatarContainer, { backgroundColor: theme.primary }]}>
           <Icon name="user" size={40} color="#fff" />
         </View>
-        <Text style={styles.username}>{user?.username}</Text>
-        <Text style={styles.email}>StreamBox Member</Text>
+        <Text style={[styles.username, { color: theme.text }]}>{user?.username}</Text>
+        <Text style={[styles.email, { color: theme.textSecondary }]}>StreamBox Member</Text>
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Icon name="heart" size={28} color="#e94560" />
-          <Text style={styles.statNumber}>{favouritesCount}</Text>
-          <Text style={styles.statLabel}>Favourites</Text>
+        <View style={[styles.statCard, { backgroundColor: theme.card }]}>
+          <Icon name="heart" size={28} color={theme.primary} />
+          <Text style={[styles.statNumber, { color: theme.text }]}>{favouritesCount}</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Favourites</Text>
         </View>
-        <View style={styles.statCard}>
-          <Icon name="film" size={28} color="#ffd700" />
-          <Text style={styles.statNumber}>0</Text>
-          <Text style={styles.statLabel}>Watched</Text>
+        <View style={[styles.statCard, { backgroundColor: theme.card }]}>
+          <Icon name="film" size={28} color={theme.rating} />
+          <Text style={[styles.statNumber, { color: theme.text }]}>0</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Watched</Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Settings</Text>
 
-        <View style={styles.settingItem}>
+        <View style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="moon" size={20} color="#fff" />
-            <Text style={styles.settingText}>Dark Mode</Text>
+            <Icon name={isDarkMode ? "moon" : "sun"} size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>Dark Mode</Text>
           </View>
           <Switch
-            value={darkMode}
-            onValueChange={setDarkMode}
-            trackColor={{ false: '#767577', true: '#e94560' }}
-            thumbColor={darkMode ? '#fff' : '#f4f3f4'}
+            value={isDarkMode}
+            onValueChange={handleToggleTheme}
+            trackColor={{ false: theme.border, true: theme.primary }}
+            thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
           />
         </View>
 
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="bell" size={20} color="#fff" />
-            <Text style={styles.settingText}>Notifications</Text>
+            <Icon name="bell" size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>Notifications</Text>
           </View>
-          <Icon name="chevron-right" size={20} color="#999" />
+          <Icon name="chevron-right" size={20} color={theme.textTertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="lock" size={20} color="#fff" />
-            <Text style={styles.settingText}>Privacy</Text>
+            <Icon name="lock" size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>Privacy</Text>
           </View>
-          <Icon name="chevron-right" size={20} color="#999" />
+          <Icon name="chevron-right" size={20} color={theme.textTertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="help-circle" size={20} color="#fff" />
-            <Text style={styles.settingText}>Help & Support</Text>
+            <Icon name="help-circle" size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>Help & Support</Text>
           </View>
-          <Icon name="chevron-right" size={20} color="#999" />
+          <Icon name="chevron-right" size={20} color={theme.textTertiary} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>About</Text>
 
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="info" size={20} color="#fff" />
-            <Text style={styles.settingText}>About StreamBox</Text>
+            <Icon name="info" size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>About StreamBox</Text>
           </View>
-          <Icon name="chevron-right" size={20} color="#999" />
+          <Icon name="chevron-right" size={20} color={theme.textTertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={[styles.settingItem, { backgroundColor: theme.card }]}>
           <View style={styles.settingLeft}>
-            <Icon name="file-text" size={20} color="#fff" />
-            <Text style={styles.settingText}>Terms & Conditions</Text>
+            <Icon name="file-text" size={20} color={theme.text} />
+            <Text style={[styles.settingText, { color: theme.text }]}>Terms & Conditions</Text>
           </View>
-          <Icon name="chevron-right" size={20} color="#999" />
+          <Icon name="chevron-right" size={20} color={theme.textTertiary} />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.error }]} onPress={handleLogout}>
         <Icon name="log-out" size={20} color="#fff" />
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
 
-      <Text style={styles.version}>Version 1.0.0</Text>
+      <Text style={[styles.version, { color: theme.textTertiary }]}>Version 1.0.0</Text>
     </ScrollView>
   );
 };
@@ -133,7 +141,6 @@ const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
   header: {
     alignItems: 'center',
@@ -144,7 +151,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#e94560',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -152,12 +158,10 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: '#999',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -167,7 +171,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#16213e',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -175,12 +178,10 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#999',
     marginTop: 4,
   },
   section: {
@@ -190,14 +191,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 12,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#16213e',
     padding: 16,
     borderRadius: 10,
     marginBottom: 8,
@@ -209,13 +208,11 @@ const styles = StyleSheet.create({
   },
   settingText: {
     fontSize: 16,
-    color: '#fff',
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#e94560',
     padding: 16,
     borderRadius: 10,
     marginHorizontal: 16,
@@ -229,7 +226,6 @@ const styles = StyleSheet.create({
   },
   version: {
     textAlign: 'center',
-    color: '#666',
     fontSize: 12,
     marginTop: 24,
     marginBottom: 32,
