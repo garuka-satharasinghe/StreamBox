@@ -97,7 +97,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const renderMovieItem = ({ item }: { item: Movie }) => (
-    <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+    <MovieCardGrid movie={item} onPress={() => handleMoviePress(item)} />
   );
 
   return (
@@ -115,8 +115,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={[styles.greeting, { color: theme.text }]}>Welcome, {user?.username} 👋</Text>
-            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Let's relax and watch a movie</Text>
+            <Text style={[styles.greeting, { color: theme.text }]}>
+              Welcome, {user?.firstName || user?.username} 👋
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+              Let's relax and watch a movie
+            </Text>
           </View>
         </View>
 

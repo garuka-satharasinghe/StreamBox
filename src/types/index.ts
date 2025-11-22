@@ -10,13 +10,21 @@ export interface Movie {
 }
 
 export interface User {
+  id: number;
   username: string;
-  password: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  gender?: string;
+  image?: string;
+  token: string;
 }
 
 export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean;
+  error: string | null;
 }
 
 export interface FavouritesState {

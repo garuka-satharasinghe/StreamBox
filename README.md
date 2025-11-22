@@ -71,6 +71,19 @@ src/
 └── types/         # TypeScript definitions
 ```
 
+
+You can now test the app with real authentication! Here are some test users:
+#### Primary Test User
+- **Username:** `emilys`
+- **Password:** `emilyspass`
+
+#### Additional Test Users
+- **Username:** `michaelw` | **Password:** `michaelwpass`
+- **Username:** `sophiab` | **Password:** `sophiabpass`
+- **Username:** `jamesd` | **Password:** `jamesdpass`
+- **Username:** `emmal` | **Password:** `emmalpass`
+
+
 ## Screenshots
 
 _Coming soon_
