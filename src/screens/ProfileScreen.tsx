@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 48,
+    paddingVertical: 60,
     paddingHorizontal: 16,
   },
   avatarContainer: {

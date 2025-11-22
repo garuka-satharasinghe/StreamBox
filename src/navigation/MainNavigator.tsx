@@ -17,7 +17,7 @@ const MainNavigator: React.FC = () => {
           backgroundColor: '#16213e',
           borderTopWidth: 0,
           elevation: 0,
-          height: 60,
+          height: 90,
           paddingBottom: 8,
           paddingTop: 8,
         },
