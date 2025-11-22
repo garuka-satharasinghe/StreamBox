@@ -9,14 +9,14 @@ import {
   ScrollView,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/authSlice';
+import { logoutAsync } from '../redux/authSlice';
 import { toggleTheme } from '../redux/themeSlice';
-import { RootState } from '../redux/store';
+import { RootState, AppDispatch } from '../redux/store';
 import { colors } from '../redux/themeSlice';
 import Icon from 'react-native-vector-icons/Feather';
 
 const ProfileScreen: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const themeMode = useSelector((state: RootState) => state.theme.mode);
   const theme = colors[themeMode];
@@ -38,7 +38,7 @@ const ProfileScreen: React.FC = () => {
         {
           text: 'Logout',
           style: 'destructive',
-          onPress: () => dispatch(logout()),
+          onPress: () => dispatch(logoutAsync()),
         },
       ]
     );
@@ -48,10 +48,22 @@ const ProfileScreen: React.FC = () => {
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={[styles.avatarContainer, { backgroundColor: theme.primary }]}>
-          <Icon name="user" size={40} color="#fff" />
+          {user?.image ? (
+            <Icon name="user" size={40} color="#fff" />
+          ) : (
+            <Text style={styles.avatarText}>
+              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            </Text>
+          )}
         </View>
-        <Text style={[styles.username, { color: theme.text }]}>{user?.username}</Text>
-        <Text style={[styles.email, { color: theme.textSecondary }]}>StreamBox Member</Text>
+        <Text style={[styles.username, { color: theme.text }]}>
+          {user?.firstName && user?.lastName 
+            ? `${user.firstName} ${user.lastName}` 
+            : user?.username}
+        </Text>
+        <Text style={[styles.email, { color: theme.textSecondary }]}>
+          {user?.email || 'StreamBox Member'}
+        </Text>
       </View>
 
       <View style={styles.statsContainer}>
@@ -154,6 +166,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  avatarText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   username: {
     fontSize: 24,
