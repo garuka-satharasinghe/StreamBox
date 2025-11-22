@@ -42,6 +42,21 @@ export const getMovieDetails = async (movieId: number): Promise<Movie | null> =>
   }
 };
 
+export const searchMovies = async (query: string): Promise<Movie[]> => {
+  try {
+    if (!query.trim()) return [];
+    const response = await tmdbApi.get('/search/movie', {
+      params: {
+        query: query.trim(),
+      },
+    });
+    return response.data.results;
+  } catch (error) {
+    console.error('Error searching movies:', error);
+    return [];
+  }
+};
+
 export const getImageUrl = (path: string): string => {
   return `${IMAGE_BASE_URL}${path}`;
 };

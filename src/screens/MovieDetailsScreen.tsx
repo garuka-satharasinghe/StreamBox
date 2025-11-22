@@ -15,6 +15,7 @@ import { HomeStackParamList } from '../types';
 import { getImageUrl } from '../services/tmdbApi';
 import { toggleFavourite } from '../redux/favouritesSlice';
 import { RootState } from '../redux/store';
+import { colors } from '../redux/themeSlice';
 import Icon from 'react-native-vector-icons/Feather';
 
 const { width, height } = Dimensions.get('window');
@@ -31,6 +32,8 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { movie } = route.params;
   const dispatch = useDispatch();
   const favourites = useSelector((state: RootState) => state.favourites.favourites);
+  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const theme = colors[themeMode];
   const isFavourite = favourites.some((fav) => fav.id === movie.id);
 
   const handleToggleFavourite = () => {
@@ -38,7 +41,7 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
       <View style={styles.backdropContainer}>
         {movie.backdrop_path ? (
           <Image
@@ -47,8 +50,8 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             resizeMode="cover"
           />
         ) : (
-          <View style={[styles.backdrop, styles.placeholderBackdrop]}>
-            <Icon name="film" size={80} color="#666" />
+          <View style={[styles.backdrop, styles.placeholderBackdrop, { backgroundColor: theme.surface }]}>
+            <Icon name="film" size={80} color={theme.textTertiary} />
           </View>
         )}
         <View style={styles.backdropOverlay} />
@@ -61,7 +64,7 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <Icon
             name={isFavourite ? 'heart' : 'heart'}
             size={24}
-            color={isFavourite ? '#e94560' : '#fff'}
+            color={isFavourite ? theme.primary : '#fff'}
             style={isFavourite && styles.heartFilled}
           />
         </TouchableOpacity>
@@ -76,20 +79,20 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.poster, styles.placeholderPoster]}>
-              <Icon name="film" size={60} color="#666" />
+            <View style={[styles.poster, styles.placeholderPoster, { backgroundColor: theme.surface }]}>
+              <Icon name="film" size={60} color={theme.textTertiary} />
             </View>
           )}
           
           <View style={styles.titleSection}>
-            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={[styles.title, { color: theme.text }]}>{movie.title}</Text>
             <View style={styles.metaRow}>
               <View style={styles.ratingContainer}>
-                <Icon name="star" size={18} color="#ffd700" />
-                <Text style={styles.rating}>{movie.vote_average?.toFixed(1) || 'N/A'}</Text>
+                <Icon name="star" size={18} color={theme.rating} />
+                <Text style={[styles.rating, { color: theme.text }]}>{movie.vote_average?.toFixed(1) || 'N/A'}</Text>
               </View>
               {movie.release_date && (
-                <Text style={styles.year}>
+                <Text style={[styles.year, { color: theme.textSecondary }]}>
                   {new Date(movie.release_date).getFullYear()}
                 </Text>
               )}
@@ -98,23 +101,23 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Overview</Text>
-          <Text style={styles.overview}>
+          <Text style={[styles.sectionTitle, { color: theme.text }]}>Overview</Text>
+          <Text style={[styles.overview, { color: theme.textSecondary }]}>
             {movie.overview || 'No overview available for this movie.'}
           </Text>
         </View>
 
         {movie.popularity && (
           <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
-              <Icon name="trending-up" size={24} color="#e94560" />
-              <Text style={styles.statValue}>{Math.round(movie.popularity)}</Text>
-              <Text style={styles.statLabel}>Popularity</Text>
+            <View style={[styles.statBox, { backgroundColor: theme.card }]}>
+              <Icon name="trending-up" size={24} color={theme.primary} />
+              <Text style={[styles.statValue, { color: theme.text }]}>{Math.round(movie.popularity)}</Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Popularity</Text>
             </View>
-            <View style={styles.statBox}>
-              <Icon name="star" size={24} color="#ffd700" />
-              <Text style={styles.statValue}>{movie.vote_average?.toFixed(1) || 'N/A'}</Text>
-              <Text style={styles.statLabel}>Rating</Text>
+            <View style={[styles.statBox, { backgroundColor: theme.card }]}>
+              <Icon name="star" size={24} color={theme.rating} />
+              <Text style={[styles.statValue, { color: theme.text }]}>{movie.vote_average?.toFixed(1) || 'N/A'}</Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Rating</Text>
             </View>
           </View>
         )}
@@ -126,7 +129,6 @@ const MovieDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
   backdropContainer: {
     position: 'relative',
@@ -138,7 +140,6 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   placeholderBackdrop: {
-    backgroundColor: '#0f3460',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -183,7 +184,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#0f3460',
   },
   placeholderPoster: {
     justifyContent: 'center',
@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 8,
   },
   metaRow: {
@@ -213,12 +212,10 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 16,
-    color: '#fff',
     fontWeight: '600',
   },
   year: {
     fontSize: 14,
-    color: '#999',
   },
   section: {
     marginBottom: 24,
@@ -226,12 +223,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 12,
   },
   overview: {
     fontSize: 15,
-    color: '#ccc',
     lineHeight: 24,
   },
   statsContainer: {
@@ -241,7 +236,6 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#16213e',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -249,12 +243,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#999',
     marginTop: 4,
   },
 });

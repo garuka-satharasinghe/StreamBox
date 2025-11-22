@@ -4,16 +4,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers } from 'redux';
 import authReducer from './authSlice';
 import favouritesReducer from './favouritesSlice';
+import themeReducer from './themeSlice';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'favourites'],
+  whitelist: ['auth', 'favourites', 'theme'],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   favourites: favouritesReducer,
+  theme: themeReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

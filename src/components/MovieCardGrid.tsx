@@ -7,28 +7,21 @@ import { Movie } from '../types';
 import { getImageUrl } from '../services/tmdbApi';
 import Icon from 'react-native-vector-icons/Feather';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const GRID_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 2 columns with padding
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - 44) / 2;
 
 interface Props {
   movie: Movie;
   onPress: () => void;
   badge?: string;
-  width?: number;
-  fullWidth?: boolean;
 }
 
-const MovieCard: React.FC<Props> = ({ movie, onPress, badge, width, fullWidth }) => {
+const MovieCardGrid: React.FC<Props> = ({ movie, onPress, badge }) => {
   const themeMode = useSelector((state: RootState) => state.theme.mode);
   const theme = colors[themeMode];
-  
-  const cardWidth = fullWidth ? '100%' : (width || GRID_CARD_WIDTH);
 
   return (
-    <TouchableOpacity 
-      style={[styles.card, { backgroundColor: theme.card, width: cardWidth }]} 
-      onPress={onPress}
-    >
+    <TouchableOpacity style={[styles.card, { backgroundColor: theme.card }]} onPress={onPress}>
       <View style={styles.imageContainer}>
         {movie.poster_path ? (
           <Image
@@ -62,13 +55,15 @@ const MovieCard: React.FC<Props> = ({ movie, onPress, badge, width, fullWidth })
 
 const styles = StyleSheet.create({
   card: {
+    width: CARD_WIDTH,
     borderRadius: 12,
     overflow: 'hidden',
+    marginBottom: 16,
   },
   imageContainer: {
     position: 'relative',
     width: '100%',
-    aspectRatio: 10 / 13,
+    height: CARD_WIDTH * 1.4,
   },
   poster: {
     width: '100%',
@@ -118,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MovieCard;
+export default MovieCardGrid;

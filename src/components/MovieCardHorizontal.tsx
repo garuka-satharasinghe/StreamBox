@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { colors } from '../redux/themeSlice';
@@ -7,28 +7,18 @@ import { Movie } from '../types';
 import { getImageUrl } from '../services/tmdbApi';
 import Icon from 'react-native-vector-icons/Feather';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const GRID_CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 2 columns with padding
-
 interface Props {
   movie: Movie;
   onPress: () => void;
   badge?: string;
-  width?: number;
-  fullWidth?: boolean;
 }
 
-const MovieCard: React.FC<Props> = ({ movie, onPress, badge, width, fullWidth }) => {
+const MovieCardHorizontal: React.FC<Props> = ({ movie, onPress, badge }) => {
   const themeMode = useSelector((state: RootState) => state.theme.mode);
   const theme = colors[themeMode];
-  
-  const cardWidth = fullWidth ? '100%' : (width || GRID_CARD_WIDTH);
 
   return (
-    <TouchableOpacity 
-      style={[styles.card, { backgroundColor: theme.card, width: cardWidth }]} 
-      onPress={onPress}
-    >
+    <TouchableOpacity style={[styles.card, { backgroundColor: theme.card }]} onPress={onPress}>
       <View style={styles.imageContainer}>
         {movie.poster_path ? (
           <Image
@@ -62,13 +52,15 @@ const MovieCard: React.FC<Props> = ({ movie, onPress, badge, width, fullWidth })
 
 const styles = StyleSheet.create({
   card: {
+    width: 140,
     borderRadius: 12,
     overflow: 'hidden',
+    marginRight: 12,
   },
   imageContainer: {
     position: 'relative',
     width: '100%',
-    aspectRatio: 10 / 13,
+    height: 182, // 140 * 1.3
   },
   poster: {
     width: '100%',
@@ -82,8 +74,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 0,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 3,
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
     backgroundColor: '#4dd0e1',
@@ -118,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MovieCard;
+export default MovieCardHorizontal;

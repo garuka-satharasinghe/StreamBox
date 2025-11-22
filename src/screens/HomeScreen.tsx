@@ -7,12 +7,16 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import { colors } from '../redux/themeSlice';
 import { Movie } from '../types';
-import { getTrendingMovies, getPopularMovies } from '../services/tmdbApi';
-import MovieCard from '../components/MovieCard';
+import { getTrendingMovies, getPopularMovies, searchMovies } from '../services/tmdbApi';
+import MovieCardHorizontal from '../components/MovieCardHorizontal';
+import MovieCardGrid from '../components/MovieCardGrid';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HomeStackParamList } from '../types';
 import Icon from 'react-native-vector-icons/Feather';
@@ -26,10 +30,14 @@ interface Props {
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
+  const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<'trending' | 'popular'>('trending');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
+  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const theme = colors[themeMode];
 
   const fetchMovies = async () => {
     try {
@@ -51,6 +59,21 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     fetchMovies();
   }, []);
 
+  useEffect(() => {
+    const delaySearch = setTimeout(async () => {
+      if (searchQuery.trim()) {
+        setIsSearching(true);
+        const results = await searchMovies(searchQuery);
+        setSearchResults(results);
+        setIsSearching(false);
+      } else {
+        setSearchResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delaySearch);
+  }, [searchQuery]);
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchMovies();
@@ -60,78 +83,139 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('MovieDetails', { movie });
   };
 
-  const displayMovies = selectedTab === 'trending' ? trendingMovies : popularMovies;
-  const badge = selectedTab === 'trending' ? 'Trending' : 'Popular';
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#e94560" />
+      <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
+  const renderMovieItem = ({ item }: { item: Movie }) => (
+    <MovieCard movie={item} onPress={() => handleMoviePress(item)} />
+  );
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hello, {user?.username}! 👋</Text>
-          <Text style={styles.subtitle}>What do you want to watch?</Text>
-        </View>
-      </View>
-
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === 'trending' && styles.activeTab]}
-          onPress={() => setSelectedTab('trending')}
-        >
-          <Icon
-            name="trending-up"
-            size={18}
-            color={selectedTab === 'trending' ? '#fff' : '#999'}
-          />
-          <Text style={[styles.tabText, selectedTab === 'trending' && styles.activeTabText]}>
-            Trending
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === 'popular' && styles.activeTab]}
-          onPress={() => setSelectedTab('popular')}
-        >
-          <Icon
-            name="award"
-            size={18}
-            color={selectedTab === 'popular' ? '#fff' : '#999'}
-          />
-          <Text style={[styles.tabText, selectedTab === 'popular' && styles.activeTabText]}>
-            Popular
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={displayMovies}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <MovieCard
-            movie={item}
-            onPress={() => handleMoviePress(item)}
-            badge={badge}
-          />
-        )}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#e94560"
+            tintColor={theme.primary}
           />
         }
-        showsVerticalScrollIndicator={false}
-      />
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={[styles.greeting, { color: theme.text }]}>Welcome, {user?.username} 👋</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Let's relax and watch a movie</Text>
+          </View>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={[styles.searchBar, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Icon name="search" size={20} color={theme.textSecondary} />
+            <TextInput
+              style={[styles.searchInput, { color: theme.text }]}
+              placeholder="Search Movie..."
+              placeholderTextColor={theme.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={handleClearSearch}>
+                <Icon name="x" size={20} color={theme.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Search Results */}
+        {searchQuery.trim() && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                Search Results
+              </Text>
+            </View>
+            {isSearching ? (
+              <ActivityIndicator size="small" color={theme.primary} style={styles.loadingIndicator} />
+            ) : searchResults.length > 0 ? (
+              <FlatList
+                data={searchResults.slice(0, 6)}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                columnWrapperStyle={styles.searchRow}
+                contentContainerStyle={styles.searchList}
+                renderItem={({ item }) => (
+                  <MovieCardGrid movie={item} onPress={() => handleMoviePress(item)} />
+                )}
+                scrollEnabled={false}
+                key="search-grid"
+              />
+            ) : (
+              <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+                No movies found
+              </Text>
+            )}
+          </View>
+        )}
+
+        {/* Trending Section */}
+        {!searchQuery.trim() && (
+          <>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>Trending</Text>
+                <TouchableOpacity style={styles.viewAllButton}>
+                  <Text style={[styles.viewAllText, { color: theme.primary }]}>View all</Text>
+                  <Icon name="chevron-right" size={16} color={theme.primary} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={trendingMovies.slice(0, 6)}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalList}
+                renderItem={({ item }) => (
+                  <MovieCardHorizontal movie={item} onPress={() => handleMoviePress(item)} badge="Trending" />
+                )}
+              />
+            </View>
+
+            {/* Popular Section */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>Popular</Text>
+                <TouchableOpacity style={styles.viewAllButton}>
+                  <Text style={[styles.viewAllText, { color: theme.primary }]}>View all</Text>
+                  <Icon name="chevron-right" size={16} color={theme.primary} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={popularMovies.slice(0, 6)}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.horizontalList}
+                renderItem={({ item }) => (
+                  <MovieCardHorizontal movie={item} onPress={() => handleMoviePress(item)} badge="Popular" />
+                )}
+              />
+            </View>
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -139,64 +223,87 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
     paddingTop: 48,
+    paddingBottom: 16,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: 13,
   },
-  tabContainer: {
-    flexDirection: 'row',
+  searchContainer: {
     paddingHorizontal: 16,
-    marginBottom: 16,
-    gap: 12,
+    marginBottom: 20,
   },
-  tab: {
-    flex: 1,
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: '#16213e',
-    gap: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
   },
-  activeTab: {
-    backgroundColor: '#e94560',
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    padding: 0,
   },
-  tabText: {
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewAllText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#999',
   },
-  activeTabText: {
-    color: '#fff',
+  horizontalList: {
+    paddingLeft: 16,
+    paddingRight: 16,
+    gap: 8,
   },
-  list: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+  searchList: {
+    paddingHorizontal: 8,
   },
-  row: {
+  searchRow: {
     justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    gap: 12,
+  },
+  loadingIndicator: {
+    marginVertical: 20,
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 14,
+    marginVertical: 20,
+    paddingHorizontal: 16,
   },
 });
 

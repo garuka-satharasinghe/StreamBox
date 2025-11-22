@@ -9,8 +9,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/authSlice';
+import { RootState } from '../redux/store';
+import { colors } from '../redux/themeSlice';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from '../types';
 
@@ -25,6 +27,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const dispatch = useDispatch();
+  const themeMode = useSelector((state: RootState) => state.theme.mode);
+  const theme = colors[themeMode];
 
   const validateForm = (): boolean => {
     if (username.trim().length < 3) {
@@ -51,27 +55,27 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join StreamBox Today</Text>
+        <Text style={[styles.title, { color: theme.primary }]}>Create Account</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>Join StreamBox Today</Text>
 
         <View style={styles.form}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.card, color: theme.text, borderColor: theme.border }]}
             placeholder="Username"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.textSecondary}
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
           />
 
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.card, color: theme.text, borderColor: theme.border }]}
             placeholder="Password"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.textSecondary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -79,16 +83,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           />
 
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: theme.card, color: theme.text, borderColor: theme.border }]}
             placeholder="Confirm Password"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.textSecondary}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
             autoCapitalize="none"
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={handleRegister}>
             <Text style={styles.buttonText}>Register</Text>
           </TouchableOpacity>
 
@@ -96,7 +100,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             style={styles.linkButton}
             onPress={() => navigation.navigate('Login')}
           >
-            <Text style={styles.linkText}>Already have an account? Login</Text>
+            <Text style={[styles.linkText, { color: theme.text }]}>Already have an account? Login</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -107,7 +111,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
   content: {
     flex: 1,
@@ -117,13 +120,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#e94560',
     textAlign: 'center',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 18,
-    color: '#fff',
     textAlign: 'center',
     marginBottom: 50,
   },
@@ -131,17 +132,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: '#16213e',
-    color: '#fff',
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
   },
   button: {
-    backgroundColor: '#e94560',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -157,7 +154,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkText: {
-    color: '#fff',
     fontSize: 14,
   },
 });
