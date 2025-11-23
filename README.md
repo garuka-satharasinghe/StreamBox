@@ -85,7 +85,6 @@ src/
 
 ## Screenshots
 <img width="144" height="323.2" alt="Screenshot_1763906933" src="https://github.com/user-attachments/assets/e7df5610-995b-4ab4-8455-6ad22922f7cf" />
-<img width="144" height="323.2" alt="Screenshot_1763905042" src="https://github.com/user-attachments/assets/997e15c8-5b51-4523-ae59-3a68efae156f" />
 <img width="144" height="323.2" alt="Screenshot_1763904913" src="https://github.com/user-attachments/assets/e4f0f8a5-a665-481b-834a-294514dd3cfc" />
 <img width="144" height="323.2" alt="Screenshot_1763905080" src="https://github.com/user-attachments/assets/270ad621-576f-4506-96fa-383460021b17" />
 <img width="144" height="323.2" alt="Screenshot_1763905087" src="https://github.com/user-attachments/assets/d2922b5a-768f-4f96-be6c-782d8a896d4c" />
